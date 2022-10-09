@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>李晓琪-13011894804</title>
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		.wrapper{
+			width: 1000px;
+			margin: 0 auto;
+		}
+		.question{
+			padding: 10px 0;
+		}
+		.question p{
+			margin: 6px 0;
+		}
+		.answer{
+			width: 978px;
+			padding: 10px;
+			border: 1px solid #ccc;
+		}
+		.startBox{
+			width: 958px;
+			min-height: 650px;
+			margin: 10px 0;
+			padding: 10px;
+			border: 1px solid #ccc;
+		}
+		#star-six {
+	        width: 0;
+	        height: 0;
+	        position: relative;
+	        margin: 0 auto;
+	        border-color: transparent;
+	        border-bottom-color:  #6376ff1f;
+	        border-style: solid;
+	    }
+	    @keyframes mymove{
+	    	0%{
+	    		border-width: 0;
+	    	}
+	    	50%{
+	    		border-width: 50%;
+	    	}
+	    	100%{
+	    		border-width: 100%;
+	    	}
+	    }
+	    #star2 {
+	        width: 0;
+	        height: 0;
+	        position: absolute;
+	        border-color: transparent;
+	        border-top-color: #6376ff1f;
+	        border-style: solid;
+	    }
+	</style>
+</head>
+<body>
+<div class="wrapper">
+	<div class="question">
+		<p>一个input输入框，一个output[用什么容器，标签都可以],input要求输入一个数，表示图形面积
+		output要求输出一个六芒星[必须自己用css+html画出来，不能使用第三方]，六芒星面积是input的数值。
+		当input发生改变时，输出图形使用css3新特性进行过渡。</p>
+		<p>【请注意考虑边界条件和异常输入】</p>
+		<p>加分项：input可以处理汉字表示的数字如：十一 十二</p>
+	</div>
+	<div class="answer">
+		<label>
+			<span>请输入六芒星面积：</span>
+			<input type="text" value="一十五万一" />
+			<span>取值范围：数字10~200000之间</span>
+		</label>
+		<div class="startBox"></div>
+	</div>
+</div>
+<script src="jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+	renderStar();
+	function renderStar(){
+		// val是总面积
+		var val=$('input').val();
+		// 汉字0-10
+		var numString='零一二三四五六七八九十';
+		// 验证数据是否可用
+		if(parseFloat(val)<10){
+			$('.startBox').html('<h2 class="tips">六芒星面积过小，建议更换数值</h2>');
+			return false;
+		}
+		if(parseFloat(val)>200000){
+			$('.startBox').html('<h2 class="tips">六芒星面积过大，建议更换数值</h2>');
+			return false;
+		}
+		if(numString.indexOf(val.charAt(0))>-1){
+			if(isNaN(parseFloat(chineseToNumber(val)))||parseFloat(chineseToNumber(val))==0){
+				$('.startBox').html('<h2 class="tips">数据输入错误，请输入数字</h2>');
+				return false;
+			}else{
+				val=parseFloat(chineseToNumber(val));
+			}
+		}else if(numString.indexOf(val.charAt(0))==-1&&isNaN(parseFloat(val))){
+			$('.startBox').html('<h2 class="tips">数据输入错误，请输入数字</h2>');
+			return false;
+		}
+		val=parseFloat(val);
+		$('.startBox').html('<div id="star-six"><div id="star2"></div></div>');
+		//六芒星元素
+		var sixStart=$('#star-six');
+		// 一个等边三角形的面积
+		var triangleArea=val/2;
+		//三角形边长
+		var SideLength=Math.sqrt(triangleArea*2/Math.sin(Math.PI/3))+'px';
+		var positionTop=parseFloat(SideLength)/3+'px';
+		var left=parseFloat(SideLength)*-1+'px';
+		sixStart.css({
+			'borderLeftWidth':SideLength,
+			'borderRightWidth':SideLength,
+			'borderBottomWidth':SideLength,
+			'animation':'mymove 3s 1',
+			'-webkit-animation':'mymove 3s 1'
+		});
+		$('#star2').css({
+			'borderLeftWidth':SideLength,
+			'borderRightWidth':SideLength,
+			'borderTopWidth':SideLength,
+			'top': positionTop,
+	        'left': left,
+	        'animation':'mymove 3s 1',
+	        '-webkit-animation':'mymove 3s 1'
+		});
+	}
+	$('input[type=text]').change(function(){
+		renderStar();
+	});
+// 汉字数字转为阿拉伯数字 
+	function chineseToNumber(cstr){
+		var chnNumChar = {
+			零:0,
+			一:1,
+			二:2,
+			三:3,
+			四:4,
+			五:5,
+			六:6,
+			七:7,
+			八:8,
+			九:9
+		};
+
+		var chnNameValue = {
+			十:{value:10, secUnit:false},
+			百:{value:100, secUnit:false},
+			千:{value:1000, secUnit:false},
+			万:{value:10000, secUnit:true}
+		}
+		var rtn = 0;
+		var section = 0;
+		var number = 0;
+		var secUnit = false;
+		var chnArray=Object.keys(chnNameValue);
+		var str = cstr.split('');
+		var tenUnit=0;
+		if(str[str.length-2]!='十'){
+			var lastUnit=str[str.length-2];
+			$.each(chnArray,function(index,value){
+				if(lastUnit===value){
+					var defaultUnit=chnArray[index-1];
+					str.push(defaultUnit);	
+				}
+			});
+		}
+		for(var i = 0; i < str.length; i++){
+			var num = chnNumChar[str[i]];
+			if(typeof num !== 'undefined'){
+				number = num;
+				if(i === str.length - 1){
+					section += number;
+				}
+			}else{
+				var unit = chnNameValue[str[i]].value;
+				secUnit = chnNameValue[str[i]].secUnit;
+				if(secUnit){
+					section = (section + number) * unit;
+					rtn += section;
+					section = 0;
+				}else{
+					section += (number * unit);
+				}
+				number = 0;
+			}
+		}
+		return rtn + section;
+	}
+</script>
+</body>
+</html>
